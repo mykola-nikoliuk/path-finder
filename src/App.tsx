@@ -10,17 +10,16 @@ import mapBackground from './components/GameGrid/mapBackground.jpg'
 import { CharacterView } from './components/CharacterView/CharacterView';
 import { Character } from './models/Character';
 
-const GRID_SIZE = { width: 60, height: 90 };
+const GRID_SIZE = { width: 90, height: 60 };
 const LOCAL_STORAGE_GRID_KEY = 'grid';
 const cellSize = 24;
 const characterSize = 32;
 
-const startPosition = { x: 26, y: 0 };
+const startPosition = { x: 0, y: 26 };
 const endPosition = { x: 14, y: 14 };
 
 function App() {
   const grid = useGridMapEmitter(GRID_SIZE, GridCell.Empty, LOCAL_STORAGE_GRID_KEY);
-  const [gridVersion, setGridVersion] = useState(0);
   const pathFinder = useMemo(() => new PathFinder(grid), []);
   const character = useMemo(() => new Character(startPosition), []);
   const characterRef = useRef<HTMLDivElement>();
@@ -51,10 +50,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const onMapUpdate = () => {
-      setGridVersion(version => version + 1);
-      saveGrid(grid);
-    }
+    const onMapUpdate = () => saveGrid(grid);
     grid.emitter.on(GridMapEmitter.events.update, onMapUpdate);
 
     character.on(Character.events.moved, setCharacterPosition);
@@ -83,7 +79,7 @@ function App() {
 
   return (
     <div className="App">
-      <GameGrid grid={grid} gridVersion={gridVersion} size={cellSize} onClick={onCellClick} background={mapBackground} />
+      <GameGrid grid={grid} size={cellSize} onClick={onCellClick} background={mapBackground} />
       <CharacterView size={characterSize} characterRef={characterRef as Ref<HTMLDivElement>} />
     </div>
   );

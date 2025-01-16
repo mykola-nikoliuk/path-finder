@@ -1,28 +1,35 @@
-import React, { PropsWithChildren, useCallback, useMemo } from 'react';
-import styled from 'styled-components';
+import React, { MouseEventHandler, Ref, useCallback, useEffect, useRef } from 'react';
 import noop from 'lodash/noop';
 import { GridMap } from '../../models/GridMap';
-import { GameCell } from '../GameCell';
 import { GridCell, Position } from '../../types';
 
-interface GameGridProps extends PropsWithChildren {
+interface GameGridProps {
   grid: GridMap<GridCell>;
-  gridVersion: number;
   background?: string;
   onClick?: (position: Position, shiftKey: boolean) => void;
   size: number;
 }
 
-export const GameGrid = ({ grid, gridVersion, size, onClick = noop, background = '', children }: GameGridProps) => {
+export const GameGrid = ({ grid, size, onClick = noop, background = '' }: GameGridProps) => {
+  const { width, height } = grid.size;
+  const ref = useRef<HTMLCanvasElement>();
+  const canvasWidth = width * size;
+  const canvasHeight = height * size;
+  let backgroundImage: HTMLImageElement | null;
 
-  const { width, height} = grid.size;
+  const draw = useCallback(() => {
 
-  const onClickHandler = useCallback((e: MouseEvent, position: Position) => {
-    onClick(position, e.shiftKey);
-  }, []);
+    if (!ref.current) return;
 
-  const cells = useMemo(() => {
-    const cells = [];
+    const ctx = ref.current.getContext('2d');
+
+
+    if (!ctx) return;
+
+    if (background && backgroundImage) {
+      ctx.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height, 0, 0, canvasWidth, canvasHeight);
+    }
+
     const totalCells = width * height;
 
     for (let i = 0; i < totalCells; i++) {
@@ -30,33 +37,54 @@ export const GameGrid = ({ grid, gridVersion, size, onClick = noop, background =
         x: i % width,
         y: Math.floor(i / width)
       };
+
       const color = cellToColor(grid.get(position));
-      cells.push(<GameCell key={i} size={size} color={color} onClick={e => onClickHandler(e, position)} />)
+      ctx.fillStyle = color;
+
+      ctx.fillRect(position.x * size, position.y * size, size, size);
     }
 
-    return cells;
-  }, [gridVersion]);
+  }, [size]);
 
-  return <StyledGameGrid width={size * width} $background={background}>
-    {cells}
-    {children}
-  </StyledGameGrid>
+  useEffect(() => {
+    draw();
+  });
+
+  useEffect(() => {
+    if (!background) backgroundImage = null;
+
+    const image = new Image();
+
+    image.onload = () => {
+      backgroundImage = image;
+      draw();
+    }
+
+    image.src = background;
+
+    return () => {
+      image.onload = noop;
+    }
+  }, [background]);
+
+  const onClickHandler = useCallback<MouseEventHandler>((e) => {
+    const computedStyle = (e.target as Element).getBoundingClientRect();
+    const position = {
+      x: (e.clientX - computedStyle.left) / size | 0,
+      y: (e.clientY - computedStyle.top) / size | 0,
+    };
+    console.log(position);
+    onClick(position, e.shiftKey);
+  }, []);
+
+  return <canvas ref={ref as Ref<HTMLCanvasElement>} width={size * width} height={size * height} onClick={onClickHandler} />
 }
 
-const StyledGameGrid = styled.div<{ width: number, $background: string }>`
-  display: flex;
-  flex-wrap: wrap;
-  width: ${({ width }) => width}px;
-  border-left: solid 1px grey;
-  border-top: solid 1px grey;
-  background-image: url("${({$background}) => $background}");
-  background-size: 100% 100%;
-`;
 
 function cellToColor(gameCell: GridCell) {
   switch (gameCell) {
     case GridCell.Block:
-      return 'grey';
+      return '#0008';
 
     case GridCell.Trail:
       return 'lightblue';
