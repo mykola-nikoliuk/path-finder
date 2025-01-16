@@ -1,18 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { PropsWithChildren, useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import noop from 'lodash/noop';
 import { GridMap } from '../../models/GridMap';
 import { GameCell } from '../GameCell';
 import { GridCell, Position } from '../../types';
 
-interface GameGridProps {
+interface GameGridProps extends PropsWithChildren {
   grid: GridMap<GridCell>;
   background?: string;
   onClick?: (position: Position, shiftKey: boolean) => void;
   size: number;
 }
 
-export const GameGrid = ({ grid, size, onClick = noop, background = '' }: GameGridProps) => {
+export const GameGrid = ({ grid, size, onClick = noop, background = '', children }: GameGridProps) => {
 
   const { width, height} = grid.size;
 
@@ -38,6 +38,7 @@ export const GameGrid = ({ grid, size, onClick = noop, background = '' }: GameGr
 
   return <StyledGameGrid width={size * width} $background={background}>
     {cells}
+    {children}
   </StyledGameGrid>
 }
 
