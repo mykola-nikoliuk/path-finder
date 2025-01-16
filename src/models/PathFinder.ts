@@ -58,6 +58,7 @@ export class PathFinder {
   }
 
   private findPath() {
+    console.time('find');
     const { from, to } = this;
     if (from && to) {
       const pathMap = new GridMap<number>(this.gridMap.size, Infinity);
@@ -116,6 +117,7 @@ export class PathFinder {
         this.path = newPath.reverse();
       }
 
+      console.timeEnd('find');
       return isEndFound;
     }
 

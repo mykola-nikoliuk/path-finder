@@ -7,12 +7,13 @@ import { GridCell, Position } from '../../types';
 
 interface GameGridProps extends PropsWithChildren {
   grid: GridMap<GridCell>;
+  gridVersion: number;
   background?: string;
   onClick?: (position: Position, shiftKey: boolean) => void;
   size: number;
 }
 
-export const GameGrid = ({ grid, size, onClick = noop, background = '', children }: GameGridProps) => {
+export const GameGrid = ({ grid, gridVersion, size, onClick = noop, background = '', children }: GameGridProps) => {
 
   const { width, height} = grid.size;
 
@@ -34,7 +35,7 @@ export const GameGrid = ({ grid, size, onClick = noop, background = '', children
     }
 
     return cells;
-  }, undefined);
+  }, [gridVersion]);
 
   return <StyledGameGrid width={size * width} $background={background}>
     {cells}

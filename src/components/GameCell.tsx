@@ -14,6 +14,7 @@ const StyledGameCell = styled.div<GameCellProps>`
   height: ${props => props.size}px;
   background-color: ${props => props.color};
   border: 0;
+  opacity: 0.9;
   border-bottom: solid 1px grey;
   border-right: solid 1px grey;
   box-sizing: border-box;

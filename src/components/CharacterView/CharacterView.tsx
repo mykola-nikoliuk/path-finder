@@ -1,28 +1,19 @@
 import { Position } from '../../types';
 import styled from 'styled-components';
 import characterUrl from './character.png';
+import { Ref } from 'react';
 
 interface CharacterProps {
   size: number;
-  cellSize: number;
-  position: Position;
+  characterRef?: Ref<HTMLDivElement>;
 }
 
-export const CharacterView = ({ size, cellSize, position }: CharacterProps) => {
-
-  const deltaSize = size - cellSize;
-
-  const relativePosition: Position = {
-    x: position.x * cellSize - deltaSize / 2,
-    y: position.y * cellSize - deltaSize / 2,
-  }
-  return <StyledCharacter $size={size} $position={relativePosition} />
+export const CharacterView = ({ size, characterRef }: CharacterProps) => {
+  return <StyledCharacter ref={characterRef} $size={size} />
 }
 
-const StyledCharacter = styled.div<{ $size: number; $position: Position }>`
+const StyledCharacter = styled.div<{ $size: number }>`
   position: absolute;
-  left: ${({ $position: { x } }) => x}px;
-  top: ${({ $position: { y } }) => y}px;
   width: ${({ $size}) => $size}px;
   height: ${({ $size}) => $size}px;
   background-image: url("${characterUrl}");
