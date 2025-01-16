@@ -4,7 +4,7 @@ import { Vector } from './Vector';
 
 const DIAGONAL_MULTIPLIER = 1.4142135624;
 
-const AVAILABLE_DIRECTIONS: { shift: Vector; multiplier: number }[] = [
+const DIRECTIONS: { shift: Vector; multiplier: number }[] = [
   { shift: new Vector({x: 0, y: 1 }), multiplier: 1 },
   { shift: new Vector({x: 1, y: 1 }), multiplier: DIAGONAL_MULTIPLIER },
   { shift: new Vector({x: 1, y: 0 }), multiplier: 1 },
@@ -13,7 +13,17 @@ const AVAILABLE_DIRECTIONS: { shift: Vector; multiplier: number }[] = [
   { shift: new Vector({x: -1, y: -1 }), multiplier: DIAGONAL_MULTIPLIER },
   { shift: new Vector({x: -1, y: 0 }), multiplier: 1 },
   { shift: new Vector({x: -1, y: 1 }), multiplier: DIAGONAL_MULTIPLIER },
-]
+];
+
+const REVERSED_DIRECTIONS = DIRECTIONS.map((direction) => {
+  const shift = direction.shift.clone();
+  shift.x *= -1;
+  shift.y *= -1;
+  return {
+    shift,
+    multiplier: direction.multiplier
+  }
+});
 
 export class PathFinder {
 
@@ -28,20 +38,23 @@ export class PathFinder {
     return JSON.parse(JSON.stringify(this.path));
   }
 
-  setFrom(pos: Position) {
-    this.from = new Vector(pos);
+  setPoints(from: Position, to: Position) {
+    this.from = new Vector(from);
+    this.to = new Vector(to);
     this.findPath();
+    return this;
   }
 
-  setTo(pos: Position) {
-    this.to = new Vector(pos);
-    this.findPath();
-  }
-
-  setNext(pos: Position) {
+  setNextPoint(pos: Position) {
     this.from = this.to;
     this.to = new Vector(pos);
     this.findPath();
+    return this;
+  }
+
+  recalculate() {
+    this.findPath();
+    return this;
   }
 
   private findPath() {
@@ -52,12 +65,12 @@ export class PathFinder {
       let cellsPool: Vector[] = [from.clone()];
       pathMap.set(from, 0);
 
-      while (!isEndFound && cellsPool.length) {
+      while (cellsPool.length) {
 
         cellsPool = cellsPool.reduce((acc, cell, index) => {
           const previousCellValue = Math.max(pathMap.get(cell), 0);
 
-          const cellsForNextStep = AVAILABLE_DIRECTIONS.reduce((acc, direction) => {
+          const cellsForNextStep = DIRECTIONS.reduce((acc, direction) => {
             const cellCost = direction.multiplier;
             const nextCell = direction.shift.clone().add(cell);
 
@@ -70,6 +83,7 @@ export class PathFinder {
                 pathMap.set(nextCell, currentValue);
                 acc.push(nextCell);
                 if (nextCell.isEqual(to)) {
+                  console.log('found');
                   isEndFound = true;
                 }
               }
@@ -108,16 +122,16 @@ export class PathFinder {
     return null;
   }
 
-  findCheapestWay(vector: Vector, pathMap: GridMap<number>) {
-    const costs = AVAILABLE_DIRECTIONS.map((direction) => {
+  private findCheapestWay(vector: Vector, pathMap: GridMap<number>) {
+    const costs = REVERSED_DIRECTIONS.map((direction) => {
       const directionCell = vector.clone().add(direction.shift);
-      return pathMap.has(directionCell) ? pathMap.get(directionCell) : Infinity;
+      return pathMap.has(directionCell) ? pathMap.get(directionCell) + direction.multiplier : Infinity;
     });
 
     const cheapestDirectionIndex = costs.reduce((acc, cost, index) => {
       return cost < costs[acc] ? index : acc;
     }, 0);
 
-    return AVAILABLE_DIRECTIONS[cheapestDirectionIndex].shift.clone();
+    return REVERSED_DIRECTIONS[cheapestDirectionIndex].shift.clone();
   }
 }

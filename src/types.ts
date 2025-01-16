@@ -2,6 +2,8 @@ export enum GridCell {
   Empty = 'empty',
   Block = 'block',
   Trail = 'trail',
+  Start = 'start',
+  End = 'end',
 }
 
 export interface Size {

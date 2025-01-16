@@ -16,7 +16,7 @@ export class GridMap<Cell> {
       }
     }
 
-    get({x, y}: Position) {
+    get({x, y }: Position) {
       if (!this.isReady) throw Error('Grid is not created');
       if (x >= this.size.width || y >= this.size.height) {
         throw Error('Coordinates are out of grid');
@@ -25,7 +25,7 @@ export class GridMap<Cell> {
       return this.grid[y][x];
     }
 
-    set({ x, y}: Position, value: Cell) {
+    set({ x, y }: Position, value: Cell) {
       if (!this.isReady) throw Error('Grid is not created');
       if (x < 0 || y < 0 || x >= this.size.width || y >= this.size.height) {
         throw Error('Coordinates are out of grid');
@@ -34,7 +34,7 @@ export class GridMap<Cell> {
       return this.grid[y][x] = value;
     }
 
-    has({x, y}: Position): boolean {
+    has({x, y }: Position): boolean {
       return x >= 0 && x < this.size.width && y >= 0 && y < this.size.height;
     }
 
@@ -45,11 +45,11 @@ export class GridMap<Cell> {
       return value;
     }
 
-    replaceValue(from: Cell, to: Cell) {
+    replaceValue(from: Cell[], to: Cell) {
       for (let y = 0; y <this.size.height; y++) {
         this.grid.push([]);
         for (let x = 0; x <this.size.width; x++) {
-          if (this.grid[y][x] === from) {
+          if (from.includes(this.grid[y][x])) {
             this.grid[y][x] = to;
           }
         }
