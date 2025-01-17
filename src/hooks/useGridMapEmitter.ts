@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { GridMapEmitter } from '../models/GridMapEmitter';
-import { Size } from '../types';
+import { GridCell, Size } from '../types';
+import gridJSON from '../grid.json'
 
-export const useGridMapEmitter = <Cell>(size: Size, fill: Cell, localStorageKey: string = '') => {
+export const useGridMapEmitter = <Cell = GridCell>(localStorageKey: string = '') => {
   const [, updateState] = React.useState<{}>();
   const forceUpdate = React.useCallback(() => {
     updateState({});
@@ -14,9 +15,9 @@ export const useGridMapEmitter = <Cell>(size: Size, fill: Cell, localStorageKey:
     if (localStorageString) {
       gridMapEmitter = GridMapEmitter.parse(localStorageString, GridMapEmitter<Cell>);
     } else {
-      gridMapEmitter = new GridMapEmitter<Cell>(size, fill);
+      gridMapEmitter = GridMapEmitter.parse(JSON.stringify(gridJSON), GridMapEmitter<Cell>);
     }
     gridMapEmitter.emitter.on(GridMapEmitter.events.update, forceUpdate);
     return gridMapEmitter;
-  }, [size, fill, localStorageKey]);
+  }, [localStorageKey, forceUpdate]);
 }

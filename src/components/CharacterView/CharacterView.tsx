@@ -1,4 +1,3 @@
-import { Position } from '../../types';
 import styled from 'styled-components';
 import characterUrl from './character.png';
 import { Ref } from 'react';

@@ -6,12 +6,12 @@ const DIAGONAL_MULTIPLIER = 1.4142135624;
 
 const DIRECTIONS: { shift: Vector; multiplier: number }[] = [
   { shift: new Vector({x: 0, y: 1 }), multiplier: 1 },
-  { shift: new Vector({x: 1, y: 1 }), multiplier: DIAGONAL_MULTIPLIER },
   { shift: new Vector({x: 1, y: 0 }), multiplier: 1 },
-  { shift: new Vector({x: 1, y: -1 }), multiplier: DIAGONAL_MULTIPLIER },
   { shift: new Vector({x: 0, y: -1 }), multiplier: 1 },
-  { shift: new Vector({x: -1, y: -1 }), multiplier: DIAGONAL_MULTIPLIER },
   { shift: new Vector({x: -1, y: 0 }), multiplier: 1 },
+  { shift: new Vector({x: 1, y: 1 }), multiplier: DIAGONAL_MULTIPLIER },
+  { shift: new Vector({x: 1, y: -1 }), multiplier: DIAGONAL_MULTIPLIER },
+  { shift: new Vector({x: -1, y: -1 }), multiplier: DIAGONAL_MULTIPLIER },
   { shift: new Vector({x: -1, y: 1 }), multiplier: DIAGONAL_MULTIPLIER },
 ];
 
@@ -45,16 +45,30 @@ export class PathFinder {
     return this;
   }
 
-  setNextPoint(pos: Position) {
-    this.from = this.to;
-    this.to = new Vector(pos);
-    this.findPath();
-    return this;
-  }
+  findClosestAvailablePosition(position: Position): Position | null {
+    if (this.gridMap.get(position) !== GridCell.Block) return position;
+    const maxRadius = Math.max(this.gridMap.size.width, this.gridMap.size.height);
+    let result: Vector | null = null;
 
-  recalculate() {
-    this.findPath();
-    return this;
+    for (let radius = 1; radius <= maxRadius && !result; radius++) {
+      DIRECTIONS.forEach(direction => {
+        if (result) return;
+
+        const cell = new Vector(position);
+        cell.add(direction.shift.clone().scalarMultiply(radius));
+
+        if (cell.x < 0 || cell.x >= this.gridMap.size.width || cell.y < 0 || cell.y >= this.gridMap.size.height) {
+          return;
+        }
+
+        if (this.gridMap.get(cell) !== GridCell.Block) {
+          console.log('FOUND');
+          result = cell;
+        }
+      });
+    }
+
+    return result;
   }
 
   private findPath() {

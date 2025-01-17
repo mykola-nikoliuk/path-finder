@@ -19,6 +19,12 @@ export class Vector {
     return this;
   }
 
+  scalarMultiply(value: number) {
+    this.x *= value;
+    this.y *= value;
+    return this;
+  }
+
   clone(): Vector {
     return new Vector(this);
   }
