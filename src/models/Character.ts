@@ -21,7 +21,6 @@ export class Character extends EventEmitter {
   }
 
   goPath(path: Position[]) {
-    console.log('goPath');
     clearInterval(this._animationInterval);
 
     this._pathIndex = 0;

@@ -8,7 +8,7 @@ import { useGridMapEmitter } from '../hooks/useGridMapEmitter';
 import { GridCell, Position } from '../types';
 import { PathFinder } from '../models/PathFinder';
 import { Character } from '../models/Character';
-import { debounce, throttle } from 'lodash';
+import { debounce } from 'lodash';
 import { GridMapEmitter } from '../models/GridMapEmitter';
 
 
@@ -34,8 +34,6 @@ export const PathFinderScreen = () => {
     if (!screen) return;
 
     const boundingRect = screen.getBoundingClientRect();
-
-    console.log(boundingRect.height);
 
     setCellSize(Math.max(minCellSize, boundingRect.height / GRID_SIZE.height));
   }, []);

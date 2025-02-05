@@ -62,7 +62,6 @@ export class PathFinder {
         }
 
         if (this.gridMap.get(cell) !== GridCell.Block) {
-          console.log('FOUND');
           result = cell;
         }
       });
@@ -72,7 +71,6 @@ export class PathFinder {
   }
 
   private findPath() {
-    console.time('find');
     const { from, to } = this;
     if (from && to) {
       const pathMap = new GridMap<number>(this.gridMap.size, Infinity);
@@ -98,7 +96,6 @@ export class PathFinder {
                 pathMap.set(nextCell, currentValue);
                 acc.push(nextCell);
                 if (nextCell.isEqual(to)) {
-                  console.log('found');
                   isEndFound = true;
                 }
               }
@@ -131,7 +128,6 @@ export class PathFinder {
         this.path = newPath.reverse();
       }
 
-      console.timeEnd('find');
       return isEndFound;
     }
 

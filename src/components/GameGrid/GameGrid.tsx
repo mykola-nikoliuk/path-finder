@@ -28,8 +28,6 @@ export const GameGrid = ({ grid, size, onClick = noop, background = '', showWall
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
 
   const draw = useCallback(() => {
-    console.log('draw');
-
     if (!ref.current) return;
 
     const ctx = ref.current.getContext('2d');
@@ -37,7 +35,6 @@ export const GameGrid = ({ grid, size, onClick = noop, background = '', showWall
 
     if (!ctx) return;
 
-    console.log('draw image', backgroundImage);
     if (backgroundImage) {
       ctx.drawImage(backgroundImage, 0, 0, backgroundImage.width, backgroundImage.height, 0, 0, canvasWidth, canvasHeight);
     }
@@ -81,7 +78,6 @@ export const GameGrid = ({ grid, size, onClick = noop, background = '', showWall
     const image = new Image();
 
     image.onload = () => {
-      console.log('setBackgroundImage');
       setBackgroundImage(image);
     }
 
@@ -94,7 +90,6 @@ export const GameGrid = ({ grid, size, onClick = noop, background = '', showWall
 
   const onClickHandler = useCallback<MouseEventHandler>((e) => {
     const position = getPosition(e, size);
-    console.log(position);
     onClick(position, e.shiftKey);
   }, [size, onClick]);
 
